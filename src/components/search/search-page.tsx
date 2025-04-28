@@ -81,9 +81,9 @@ export function SearchPage() {
   };
 
   return (
-    <div className="container flex flex-col items-center px-4 py-10 md:py-16">
-      <div className="mb-10 max-w-3xl text-center">
-        <h1 className="mb-3 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+    <div className="container inset-0 flex flex-col items-center px-4 py-10 justify-center  md:py-16 **:">
+      <div className="mb-10 max-w-3xl text-center justify-center">
+        <h1 className="mb-3 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl justify-center">
           Get instant, intelligent answers
         </h1>
         <p className="mb-6 text-lg text-muted-foreground md:text-xl">
