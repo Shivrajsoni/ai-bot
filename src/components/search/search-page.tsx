@@ -1,15 +1,17 @@
 "use client";
-import { useState } from 'react';
+import { useState,useRef, useEffect } from 'react';
 import { SearchBar } from '@/components/search/search-bar';
 import { ResultDisplay } from '@/components/search/result-display';
 import { useToast } from '@/hooks/use-toast';
+
 
 export function SearchPage() {
   const [prompt, setPrompt] = useState<string>('');
   const [result, setResult] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
-  const maxToken = 256;
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const maxToken = 1000;
 
   const handleSearch = async () => {
     if (!prompt.trim()) {
@@ -80,6 +82,18 @@ export function SearchPage() {
     }
   };
 
+  useEffect(()=>{
+    const handlePageClick = (e:MouseEvent) =>{
+      if(inputRef.current){
+        inputRef.current.focus();
+      }
+    };
+    document.addEventListener('click',handlePageClick);
+    return ()=>{
+      document.removeEventListener('click',handlePageClick);
+    }
+  },[])
+
   return (
     <div className="container inset-0 flex flex-col items-center px-4 py-10 justify-center  md:py-16 **:">
       <div className="mb-10 max-w-3xl text-center justify-center">
@@ -98,6 +112,7 @@ export function SearchPage() {
           setPrompt={setPrompt}
           onSearch={handleSearch}
           isLoading={isLoading}
+          ref = {inputRef}
         />
 
         {(result || isLoading) && (
