@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Button } from '../ui/button';
 
 interface ResultDisplayProps {
   result: string;
@@ -8,6 +9,7 @@ interface ResultDisplayProps {
 
 export function ResultDisplay({ result, isLoading }: ResultDisplayProps) {
   return (
+    <>
     <Card className="border-2 transition-all duration-300 ease-in-out">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-medium">Result</CardTitle>
@@ -28,5 +30,7 @@ export function ResultDisplay({ result, isLoading }: ResultDisplayProps) {
         )}
       </CardContent>
     </Card>
+    
+  </>
   );
 }

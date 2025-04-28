@@ -3,7 +3,12 @@ import { useState,useRef, useEffect } from 'react';
 import { SearchBar } from '@/components/search/search-bar';
 import { ResultDisplay } from '@/components/search/result-display';
 import { useToast } from '@/hooks/use-toast';
+import { MessageBubble } from './message-bubble';
 
+export type SystemPrompts = {
+  role: "system" | "user";
+  content:string;
+}
 
 export function SearchPage() {
   const [prompt, setPrompt] = useState<string>('');
@@ -11,8 +16,19 @@ export function SearchPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const maxToken = 1000;
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const maxToken = 4000;
+  const [messages, setMessages] = useState<SystemPrompts[]>([]);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+  
+  const createMessage = (role: "user" | "system", content: string): SystemPrompts => ({
+    role,
+    content,
+  });
+  
   const handleSearch = async () => {
     if (!prompt.trim()) {
       toast({
@@ -27,40 +43,17 @@ export function SearchPage() {
     setResult('');
 
     try {
-      // Simulated API call (replace with actual API)
-      setTimeout(() => {
-        const mockResponse = {
-          text: `Here's a detailed answer to your query about "${prompt}". This response contains information that would typically come from an AI model like those used by Perplexity. The quality and length of this response would vary based on the complexity of your query and available information. For demonstration purposes, this is a placeholder result.`,
-        };
-
-        const tokenUsed = mockResponse.text.split(' ').length;
-
-        if (tokenUsed > maxToken) {
-          toast({
-            title: 'Token Limit Exceeded',
-            description: `Used ${tokenUsed} tokens (limit: ${maxToken})`,
-            variant: 'destructive',
-          });
-        }
-
-        setResult(mockResponse.text);
-        toast({
-          title: 'Search Complete',
-          description: 'Results are ready to view',
-        });
-        setIsLoading(false);
-      }, 1500);
-       
+      const updatedMessages = [...messages, createMessage("user", prompt)];
       const response = await fetch('/api/prompt', {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ messages: updatedMessages}),
       });
-      
-      const result = await response.json();
-      const tokenUsed = result.text.split(' ').length;
+
+      const data: { text?: string } = await response.json();
+      const tokenUsed = data.text?.split(' ').length || 100;
 
       if (tokenUsed > maxToken) {
         toast({
@@ -69,8 +62,13 @@ export function SearchPage() {
           variant: 'destructive',
         });
       }
-      setResult(result.text);
-      
+
+      setMessages([...updatedMessages, createMessage("system", data.text || " ")]);
+      setResult(data.text || "");
+      toast({
+        title: 'Search Complete',
+        description: 'Results are ready to view',
+      });
     } catch (error) {
       console.error('Error fetching prompt response', error);
       toast({
@@ -78,6 +76,7 @@ export function SearchPage() {
         description: 'Failed to fetch results. Please try again.',
         variant: 'destructive',
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -95,7 +94,7 @@ export function SearchPage() {
   },[])
 
   return (
-    <div className="container inset-0 flex flex-col items-center px-4 py-10 justify-center  md:py-16 **:">
+    <div className="container inset-0 flex flex-col items-center px-4 py-10 justify-center  md:py-16">
       <div className="mb-10 max-w-3xl text-center justify-center">
         <h1 className="mb-3 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl justify-center">
           Get instant, intelligent answers
@@ -113,7 +112,18 @@ export function SearchPage() {
           onSearch={handleSearch}
           isLoading={isLoading}
           ref = {inputRef}
+          placeholder = {messages.length === 0 ?"Ask Anything":"Continue Asking"}
         />
+          <div className="flex flex-col space-y-4 max-h-[500px] overflow-y-auto p-4 rounded-md bg-muted">
+            {messages.map((msg, idx) => (
+              <MessageBubble
+              key={idx}
+              role={msg.role}
+              content={msg.content}
+            />
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
 
         {(result || isLoading) && (
           <ResultDisplay result={result} isLoading={isLoading} />
