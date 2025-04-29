@@ -8,10 +8,10 @@
 - [x] Make a shortcut button for search (Important)
 - [ ] Make a good prompt type pattern
     [x] - I want to make user to ask follow Along ask their questions ("Multi-turn Conversations" or "threaded interaction")
-    []  - Write predefined prompt to make user query optimized very much
-    []  - Enable a memory Area (need to create a database where user can additonally give their answer prompts)
-    []  - Need to manage a DataBase also for that 
-    []  - Study How to make it MultiLLM dependable User choice to select the text
+    [x]  - Write predefined prompt to make user query optimized very much
+    [x]  - Enable a memory Area (need to create a database where user can additonally give their answer prompts)
+    [x]  - Need to manage a DataBase also for that 
+    [x]  - Study How to make it MultiLLM dependable User choice to select the text
     []  - How cursor/chatgpt can take refernce of our current page it can also take refernce of current opened page
     []  - Study how LLM Works Under the Hood ?
     []  - 

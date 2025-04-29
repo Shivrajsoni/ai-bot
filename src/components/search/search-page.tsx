@@ -8,6 +8,7 @@ import { MessageBubble } from './message-bubble';
 export type SystemPrompts = {
   role: "system" | "user";
   content:string;
+  memory:string;
 }
 
 export function SearchPage() {
@@ -19,14 +20,17 @@ export function SearchPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const maxToken = 4000;
   const [messages, setMessages] = useState<SystemPrompts[]>([]);
-
+  const [userMemory , setUserMemory] = useState('');
   useEffect(() => {
+    const memory = localStorage.getItem('memory') as string;
+    setUserMemory(memory);
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
   
-  const createMessage = (role: "user" | "system", content: string): SystemPrompts => ({
+  const createMessage = (role: "user" | "system", content: string,memory:string): SystemPrompts => ({
     role,
     content,
+    memory
   });
   
   const handleSearch = async () => {
@@ -43,7 +47,7 @@ export function SearchPage() {
     setResult('');
 
     try {
-      const updatedMessages = [...messages, createMessage("user", prompt)];
+      const updatedMessages = [...messages, createMessage("user", prompt,userMemory)];
       const response = await fetch('/api/prompt', {
         method: 'POST',
         headers: {
@@ -63,7 +67,7 @@ export function SearchPage() {
         });
       }
 
-      setMessages([...updatedMessages, createMessage("system", data.text || " ")]);
+      setMessages([...updatedMessages, createMessage("system", data.text || " ",userMemory)]);
       setResult(data.text || "");
       toast({
         title: 'Search Complete',

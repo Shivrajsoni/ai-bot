@@ -1,11 +1,15 @@
 "use client";
 import { Search } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes'; 
+import  MemoryCard  from '../memory/memory-card';
+import { useRouter } from 'next/navigation';
 
 export function Header() {
   const { theme } = useTheme();
+  const router = useRouter();
+
   useEffect(() => {
     const starContainer = document.querySelector('.star-container')!;
     if(starContainer){
@@ -39,6 +43,7 @@ export function Header() {
       </div>
     </header>
     <div className={`star-container ${theme ==='dark'?'dark-mode':'light-mode' }`}></div>
+    {<MemoryCard />}
   </>
   );
 }
