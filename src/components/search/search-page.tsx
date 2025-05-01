@@ -86,7 +86,7 @@ export function SearchPage() {
   };
 
   useEffect(()=>{
-    const handlePageClick = (e:MouseEvent) =>{
+    const handlePageClick = () =>{
       if(inputRef.current){
         inputRef.current.focus();
       }

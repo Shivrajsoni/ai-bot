@@ -1,16 +1,21 @@
-
 import { formatMessagesForGemini } from "@/utils/formatMessages";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
 const validRoles = ["user", "model"];
 
-function filterValidMessages(messages: { role: string; content: string,memory:string }[]) {
+interface Message {
+  role: string;
+  content: string;
+  memory: string;
+}
+
+function filterValidMessages(messages: Message[]) {
   return messages.filter((msg) => validRoles.includes(msg.role));
 }
 
- const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
- const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,20 +26,31 @@ export async function POST(req: NextRequest) {
 
     // Filter only valid roles
     const filteredMessages = filterValidMessages(messages);
-
     const formattedMessages = formatMessagesForGemini(filteredMessages);
 
-     function buildSystemInstruction(formattedMessages:any){
-       if(!formattedMessages) return"Plz provide formatted Message";
+    function buildSystemInstruction(messages: Message[]) {
+      if (!messages || messages.length === 0) return "Please provide messages";
+      
+      const lastMessage = messages[messages.length - 1];
+      return `You are a helpful AI assistant. Please format your response using markdown-like syntax for better readability:
 
-       return (`Respond in a Horny tone ,using jetpack-mono-brains font style.
-        Format the response as a informative output for a tech enthusiast audience.
-        The Goal is to Assist and Help out the User , this is the user memory based
-        on this assist user ${formattedMessages.memory}`).trim();
-     }
-  
-    const finalMessage = buildSystemInstruction(formattedMessages);
-    const result = await model.generateContent({ systemInstruction:finalMessage,contents: formattedMessages });
+1. Use headings with # symbols (e.g., # Main Heading, ## Subheading)
+2. Use code blocks with triple backticks for code examples
+3. Use single backticks for inline code or technical terms
+4. Break down complex information into sections with appropriate headings
+5. Use bullet points or numbered lists for step-by-step instructions
+6. Keep paragraphs concise and well-structured
+
+The user's memory context is: ${lastMessage.memory}
+
+Please provide a clear, well-formatted response that is easy to read and understand.`.trim();
+    }
+
+    const systemInstruction = buildSystemInstruction(filteredMessages);
+    const result = await model.generateContent({ 
+      systemInstruction,
+      contents: formattedMessages 
+    });
 
     if (!result || !result.response) {
       console.error("error in LLM model ", result);

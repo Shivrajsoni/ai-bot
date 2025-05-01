@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -17,19 +16,16 @@ import { Sparkles } from 'lucide-react';
 export default function MemoryCard() {
   const [open, setOpen] = useState(false);
   const [memory, setMemory] = useState('');
-  const [savedMemory, setSavedMemory] = useState('');
 
   useEffect(() => {
     const stored = localStorage.getItem('memory');
     if (stored) {
-      setSavedMemory(stored);
       setMemory(stored);
     }
   }, []);
 
   const handleSave = () => {
     localStorage.setItem('memory', memory);
-    setSavedMemory(memory);
     setOpen(false);
   };
 
