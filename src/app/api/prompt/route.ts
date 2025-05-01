@@ -1,4 +1,5 @@
 
+import { formatMessagesForGemini } from "@/utils/formatMessages";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,11 +22,7 @@ export async function POST(req: NextRequest) {
     // Filter only valid roles
     const filteredMessages = filterValidMessages(messages);
 
-    const formattedMessages = filteredMessages.map((msg: { role: string; content: string,memory:string }) => ({
-      role: msg.role,
-      parts: [{ text: msg.content }],
-      memory:msg.memory
-    }));
+    const formattedMessages = formatMessagesForGemini(filteredMessages);
 
      function buildSystemInstruction(formattedMessages:any){
        if(!formattedMessages) return"Plz provide formatted Message";
