@@ -39,7 +39,7 @@ export function ResultDisplay({ result, isLoading }: ResultDisplayProps) {
       if (section.startsWith('```')) {
         const codeMatch = section.match(/```(\w*)\n([\s\S]*?)```/);
         if (codeMatch) {
-          const [, language, code] = codeMatch;
+          const [ code] = codeMatch;
           return (
             <pre key={index} className="bg-muted p-4 rounded-lg my-4 overflow-x-auto">
               <code className="text-sm font-mono">{code}</code>
