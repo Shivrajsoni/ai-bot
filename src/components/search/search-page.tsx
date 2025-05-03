@@ -4,6 +4,7 @@ import { SearchBar } from '@/components/search/search-bar';
 import { ResultDisplay } from '@/components/search/result-display';
 import { useToast } from '@/hooks/use-toast';
 import { MessageBubble } from './message-bubble';
+import { motion } from "framer-motion";
 
 export type SystemPrompts = {
   role: "system" | "user";
@@ -98,41 +99,77 @@ export function SearchPage() {
   },[])
 
   return (
-    <div className="container inset-0 flex flex-col items-center px-4 py-10 justify-center  md:py-16">
-      <div className="mb-10 max-w-3xl text-center justify-center">
-        <h1 className="mb-3 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl justify-center">
-          Get instant, intelligent answers
-        </h1>
-        <p className="mb-6 text-lg text-muted-foreground md:text-xl">
-          Search with AI to discover insights and get comprehensive answers
-          to your questions
-        </p>
-      </div>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex min-h-[calc(100vh-8rem)] w-full flex-col items-center justify-center"
+    >
+      <div className="w-full max-w-3xl mx-auto px-4 py-8 md:py-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-center"
+        >
+          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+            Get instant, intelligent answers
+          </h1>
+          <p className="text-lg text-muted-foreground md:text-xl">
+            Search with AI to discover insights and get comprehensive answers
+            to your questions
+          </p>
+        </motion.div>
 
-      <div className="w-full max-w-3xl space-y-6">
-        <SearchBar
-          prompt={prompt}
-          setPrompt={setPrompt}
-          onSearch={handleSearch}
-          isLoading={isLoading}
-          ref = {inputRef}
-          placeholder = {messages.length === 0 ?"Ask Anything":"Continue Asking"}
-        />
-          <div className="flex flex-col space-y-4 max-h-[500px] overflow-y-auto p-4 rounded-md bg-muted">
-            {messages.map((msg, idx) => (
-              <MessageBubble
-              key={idx}
-              role={msg.role}
-              content={msg.content}
+        <div className="w-full space-y-6 mt-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <SearchBar
+              prompt={prompt}
+              setPrompt={setPrompt}
+              onSearch={handleSearch}
+              isLoading={isLoading}
+              ref={inputRef}
+              placeholder={messages.length === 0 ? "Ask Anything" : "Continue Asking"}
             />
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
+          </motion.div>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="flex flex-col space-y-4 max-h-[60vh] min-h-[200px] w-full overflow-y-auto rounded-lg bg-muted p-4"
+          >
+            {messages.map((msg, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.1 }}
+              >
+                <MessageBubble
+                  role={msg.role}
+                  content={msg.content}
+                />
+              </motion.div>
+            ))}
+            <div ref={messagesEndRef} />
+          </motion.div>
 
-        {(result || isLoading) && (
-          <ResultDisplay result={result} isLoading={isLoading} />
-        )}
+          {(result || isLoading) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <ResultDisplay result={result} isLoading={isLoading} />
+            </motion.div>
+          )}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
